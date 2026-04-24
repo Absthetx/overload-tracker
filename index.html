@@ -191,16 +191,26 @@
     align-items: center;
   }
   .sets-cell {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--purple);
-    text-align: center;
-    padding: 10px 6px;
     border-right: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
   }
+  .sets-input {
+    width: 100%;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--purple);
+    text-align: center;
+    padding: 10px 4px;
+    border: none;
+    background: transparent;
+    outline: none;
+    min-width: 0;
+  }
+  .sets-input:focus { background: rgba(124,58,237,0.06); }
+  .sets-input::placeholder { color: var(--text3); font-weight: 400; }
   .week-group {
     display: flex;
     border-right: 1px solid var(--border);
@@ -466,7 +476,8 @@ function render() {
 
     html += `<div class="row-wrap"><div class="row-card" style="grid-template-columns:${cols};">`;
     html += `<div class="ex-name">${ex.name}</div>`;
-    html += `<div class="sets-cell">${ex.sets}</div>`;
+    const savedSets = load('abs_sets_' + ei) || ex.sets;
+    html += `<div class="sets-cell"><input class="sets-input" type="text" inputmode="numeric" placeholder="sets" value="${savedSets}" data-ei="${ei}" data-setskey="abs_sets_${ei}" /></div>`;
 
     weeks.forEach(wi => {
       const kg   = load(storageKey(ei, wi, 'kg'));
@@ -488,6 +499,13 @@ function render() {
   });
 
   body.innerHTML = html;
+
+  body.querySelectorAll('.sets-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      save(e.target.dataset.setskey, e.target.value);
+      flashSaved();
+    });
+  });
 
   body.querySelectorAll('.week-input').forEach(inp => {
     inp.addEventListener('input', e => {
